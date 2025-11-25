@@ -66,7 +66,9 @@ struct PokemonModel: Decodable, Equatable {
     }
     
     init(from decoder: Decoder) throws {
+        
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        
         
         name = container.safeStringDecode(forKey: .name)
         id = container.safeNumDecode(forKey: .id)
@@ -80,8 +82,31 @@ struct PokemonModel: Decodable, Equatable {
         }
         favorite = container.safeBoolDecode(forKey: .favorite)
         frontShiny = container.safeURLDecode(forKey: .frontShiny)
-        frontDefault = decoder.safeURLDecode(["sprites", "front_default"])
+        frontDefault = decoder.safeURLDecode(["sprites", "frontDefault"])
         types = (container.safeObjectDecode(forKey: .types) as [typeData]?)?.compactMap { $0.type}
+        
+        // create a loop to print all value
+        
+        let debugValues: [String: Any?] = [
+            "name": name,
+            "id": id,
+            "hp": hp,
+            "attack": attack,
+            "defense": defense,
+            "specialAttack": specialAttack,
+            "specialDefense": specialDefense,
+            "speed": speed,
+            "favorite": favorite,
+            "frontShiny": frontShiny,
+            "frontDefault": frontDefault,
+            "types": types
+        ]
+        
+        debugValues.forEach { key, value in
+            print("\(key): \(value ?? "nil")")
+        }
+        
+        
     }
 }
 

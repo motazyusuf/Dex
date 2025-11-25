@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 @MainActor
-class HomeViewModel: ObservableObject {
+class PokemonDetailsViewModel: ObservableObject {
     
     private let viewContext: NSManagedObjectContext
     private let repo: PokemonRepo
@@ -29,33 +29,31 @@ class HomeViewModel: ObservableObject {
             return .initial
         }
     }
-    
+
     @Published var pokemons: [Dex] = []
-    @Published var modifiedPokemons: [Dex] = []
     @Published var pokemonsState: ApiFetchingState = .initial
     
-    
+
     init(repo: PokemonRepo, context: NSManagedObjectContext) {
         self.repo = repo
         self.viewContext = context
-        
+
         Task {
             await getData()
         }
     }
     
     func getData() async {
-        
         do {
             pokemonsState = .loading
             
             // ✅ Step 1: Try to load from cache first
             let existingPokemons = try viewContext.fetch(Dex.fetchRequest())
             
-            
+           
             
             // ✅ Step 2: No cache - fetch from API
-            for id in 1 ... 20 {
+            for id in 1 ... 1 {
                 let pokemon = Dex(context: viewContext)
                 
                 do {
@@ -85,26 +83,10 @@ class HomeViewModel: ObservableObject {
             
             // ✅ Step 3: Save to Core Data for next time
             try viewContext.save()
-            modifiedPokemons = pokemons
             pokemonsState = .success
             
         } catch {
             print("❌ Request failed:", error)
             pokemonsState = .failure(error.localizedDescription)
         }
-    }
-    
-    func searchPokemons(searchText: String) {
-        var baseList = pokemons
-
-        
-        if !searchText.isEmpty {
-            baseList = baseList.filter { pokemon in
-                pokemon.name?.localizedCaseInsensitiveContains(searchText) ?? false
-            }
-        }
- 
-        modifiedPokemons = baseList
-    }
-}
-
+    }}
